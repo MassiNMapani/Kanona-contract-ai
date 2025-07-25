@@ -35,6 +35,12 @@ func UploadContract(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//This ensures the Python OCR is triggered every time a file is uploaded
+	err = services.AnalyzeContract(handler.Filename)
+	if err != nil {
+		fmt.Println("⚠️ Failed to analyze contract:", err)
+	}
+
 	fmt.Fprintf(w, "Uploaded and stored metadata for file: %s\n", handler.Filename)
 }
 
