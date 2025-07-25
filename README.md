@@ -51,5 +51,40 @@ You should see the following on your terminal:
 ```Name                     Status  User     File
 mongodb-community@7.0   started yourname ~/Library/LaunchAgents/homebrew.mxcl.mongodb-community@7.0.plist
 ```
+### Installing the Python requirements
 
+For the artificial Intelligent component, python packages will be used.
+Once python is installed on your machine, a virtual environment is required and can be initialised with the following commands: 
 
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
+Also install the necessary packages:
+
+```
+pip install flask pymupdf pytesseract spacy
+python -m spacy download en_core_web_sm
+```
+For macOS install tesseract with the following command:
+
+```
+brew install tesseract
+```
+Once you've installed packages in your virtual environment run the following command:
+`pip freeze > requirements.txt`
+
+Then you can always reinstall easily via:
+
+`pip install -r requirements.txt`
+
+There is need to setup the python environment in the ai-extraction directory; do so with the following commands in terminal:
+```
+cd ai-extraction
+python3 -m venv venv
+source venv/bin/activate
+pip install flask pymupdf pytesseract spacy
+python -m spacy download en_core_web_sm
+pip freeze > requirements.txt
+```
