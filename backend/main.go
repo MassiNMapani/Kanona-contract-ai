@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 
 	"backend/handlers"
 	"backend/middleware"
@@ -17,20 +18,32 @@ func main() {
 
 	// Set up router
 	router := mux.NewRouter()
+
+	// Apply middleware
+	router.Use(middleware.JWTMiddleware)
+
 	// Dev mock login
 	router.HandleFunc("/mock-login", handlers.MockLogin).Methods("GET")
-
-	// Register routes
+	// /me route
+	router.HandleFunc("/me", handlers.Me).Methods("GET")
+	// Health check
 	router.HandleFunc("/health", HealthCheck).Methods("GET")
-	router.HandleFunc("/upload", handlers.UploadContract).Methods("POST")
-	// Protected route: only accessible by 'admin','hod' and 'ceo'
-	//router.Handle("/contracts", middleware.RoleMiddleware("admin", "ceo")(http.HandlerFunc(handlers.GetAllContracts))).Methods("GET")
-	router.Handle("/contracts", middleware.RoleMiddleware("admin", "ceo", "hod")(http.HandlerFunc(handlers.GetAllContracts))).Methods("GET")
 
-	// File upload: allowed by 'admin', 'ppa-user', 'psa-user'
+	// Protected contract routes
+	router.Handle("/contracts", middleware.RoleMiddleware("admin", "ceo", "hod")(http.HandlerFunc(handlers.GetAllContracts))).Methods("GET")
 	router.Handle("/upload", middleware.RoleMiddleware("admin", "ppa-user", "psa-user")(http.HandlerFunc(handlers.UploadContract))).Methods("POST")
 
-	// Log available routes (for debug)
+	// ✅ Enable CORS
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowCredentials: true,
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type", "X-User-Role"},
+	})
+
+	handler := c.Handler(router)
+
+	// ✅ Log available routes BEFORE starting the server
 	log.Println("✅ Available routes:")
 	router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		path, _ := route.GetPathTemplate()
@@ -38,12 +51,12 @@ func main() {
 		return nil
 	})
 
-	// Start server
+	// ✅ Start server (only once)
 	log.Println("🚀 Server running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
 
-// Simple GET /health endpoint
+// Health check
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("Kanona Backend API is running"))

@@ -1,10 +1,10 @@
 // src/app/dashboard/test-upload/page.tsx
 "use client";
 
-import { useRole } from "@/context/RoleContext";
+import { useRole } from "../../../context/RoleContext";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import FileUpload from "@/components/FileUpload";
+import FileUpload from "../../../components/FileUpload";
 
 export default function TestUploadPage() {
   const { role } = useRole();

@@ -7,5 +7,15 @@ const api = axios.create({
   }
 })
 
+export async function getCurrentUser() {
+  const res = await fetch("http://localhost:8080/me", {
+    method: "GET",
+    credentials: "include", // ⬅️ IMPORTANT!
+  });
+
+  if (!res.ok) throw new Error("Not authenticated");
+  return await res.json();
+}
+
 export default api
 

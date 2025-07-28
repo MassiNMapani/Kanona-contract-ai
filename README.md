@@ -88,6 +88,11 @@ pip install flask pymupdf pytesseract spacy
 python -m spacy download en_core_web_sm
 pip freeze > requirements.txt
 ```
+
+Once the python environment run you will need to run the ocr service in the virtual environment
+
+`python ai-extraction/scripts/ocr_service.py`
+
 ### Running the backend
 
 To run the backend you will need to run the following commands:
