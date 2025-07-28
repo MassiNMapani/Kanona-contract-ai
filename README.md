@@ -98,7 +98,13 @@ In one terminal run this:
 
 In another terminal you will need to run the python code:
 
-'``
+```
 source ai-extraction/venv/bin/activate
 python ai-extraction/scripts/ocr_service.py
 ```
+### Running the frontend
+
+Once you change directories into the kanona-contract-ai-frontend folder you will need carry out the following commands:
+`npm run install `
+
+and then run `npm run dev`

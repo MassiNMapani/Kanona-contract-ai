@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"backend/handlers"
+	"backend/middleware"
 	"backend/utils"
 )
 
@@ -16,11 +17,18 @@ func main() {
 
 	// Set up router
 	router := mux.NewRouter()
+	// Dev mock login
+	router.HandleFunc("/mock-login", handlers.MockLogin).Methods("GET")
 
 	// Register routes
 	router.HandleFunc("/health", HealthCheck).Methods("GET")
 	router.HandleFunc("/upload", handlers.UploadContract).Methods("POST")
-	router.HandleFunc("/contracts", handlers.GetAllContracts).Methods("GET")
+	// Protected route: only accessible by 'admin','hod' and 'ceo'
+	//router.Handle("/contracts", middleware.RoleMiddleware("admin", "ceo")(http.HandlerFunc(handlers.GetAllContracts))).Methods("GET")
+	router.Handle("/contracts", middleware.RoleMiddleware("admin", "ceo", "hod")(http.HandlerFunc(handlers.GetAllContracts))).Methods("GET")
+
+	// File upload: allowed by 'admin', 'ppa-user', 'psa-user'
+	router.Handle("/upload", middleware.RoleMiddleware("admin", "ppa-user", "psa-user")(http.HandlerFunc(handlers.UploadContract))).Methods("POST")
 
 	// Log available routes (for debug)
 	log.Println("✅ Available routes:")
