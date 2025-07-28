@@ -88,3 +88,17 @@ pip install flask pymupdf pytesseract spacy
 python -m spacy download en_core_web_sm
 pip freeze > requirements.txt
 ```
+### Running the backend
+
+To run the backend you will need to run the following commands:
+
+In one terminal run this:
+
+`go run main.go`
+
+In another terminal you will need to run the python code:
+
+'``
+source ai-extraction/venv/bin/activate
+python ai-extraction/scripts/ocr_service.py
+```
