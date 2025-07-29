@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -9,6 +10,11 @@ import (
 )
 
 func MockLogin(w http.ResponseWriter, r *http.Request) {
+	email := r.URL.Query().Get("email")
+	if email == "" {
+		email = "test@example.com"
+	}
+
 	role := r.URL.Query().Get("role")
 	if role == "" {
 		role = "viewer"
@@ -31,6 +37,8 @@ func MockLogin(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 		Expires:  time.Now().Add(1 * time.Hour),
 	})
+
+	log.Printf("🔑 Mock token issued for email=%s, role=%s\n", email, role)
 
 	fmt.Fprintf(w, "✅ Mock login successful for role: %s", role)
 }

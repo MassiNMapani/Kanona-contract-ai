@@ -17,5 +17,22 @@ export async function getCurrentUser() {
   return await res.json();
 }
 
+export const fetchContracts = async () => {
+  try {
+    const res = await fetch("http://localhost:8080/contracts", {
+      method: "GET",
+      credentials: "include", // ✅ Send cookies (JWT is stored in cookie)
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch contracts");
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("⚠️ Error fetching contracts:", err);
+    return [];
+  }
+};
+
 export default api
 

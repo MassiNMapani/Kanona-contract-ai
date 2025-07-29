@@ -8,6 +8,7 @@ First step is to initial lise the backend. Use the following commands to do so:
 cd backend
 go mod init github.com/yourusername/kanona-contract-ai/backend
 go get github.com/gorilla/mux
+go get github.com/rs/cors
 go run main.go
 ```
 
