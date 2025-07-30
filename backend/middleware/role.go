@@ -62,19 +62,61 @@
 // 	}
 // }
 
+//claims, ok := r.Context().Value(UserClaimsKey).(*utils.Claims)
+
+// package middleware
+
+// import (
+// 	"backend/utils"
+// 	"log"
+// 	"net/http"
+// )
+
+// // ✅ Use the same key type defined in jwt.go
+// // type contextKey string
+
+// // const UserClaimsKey = contextKey("user")
+
+// func RoleMiddleware(requiredRoles ...string) func(http.Handler) http.Handler {
+// 	return func(next http.Handler) http.Handler {
+// 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 			// ✅ Read claims from the correct context key
+// 			log.Printf("🧪 RoleMiddleware: context value = %#v", r.Context().Value(UserClaimsKey))
+// 			claims, ok := r.Context().Value(UserClaimsKey).(*utils.Claims)
+
+// 			if !ok || claims == nil {
+// 				log.Printf("🚫 RoleMiddleware: No JWT claims found in context")
+// 				http.Error(w, "Forbidden: no valid token", http.StatusForbidden)
+// 				return
+// 			}
+
+// 			log.Printf("🔐 RoleMiddleware: Received request with role=%s", claims.Role)
+
+// 			// ✅ Check if role is allowed
+// 			for _, role := range requiredRoles {
+// 				if claims.Role == role {
+// 					next.ServeHTTP(w, r)
+// 					return
+// 				}
+// 			}
+
+//				http.Error(w, "Forbidden: insufficient role", http.StatusForbidden)
+//			})
+//		}
+//	}
 package middleware
 
 import (
-	"backend/utils"
 	"log"
 	"net/http"
+
+	"backend/utils"
 )
 
 func RoleMiddleware(requiredRoles ...string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			log.Printf("🧪 RoleMiddleware: context value = %#v", r.Context().Value(utils.UserClaimsKey))
-			claims, ok := r.Context().Value(utils.UserClaimsKey).(*utils.Claims)
+			claims, ok := utils.GetClaims(r.Context())
 			if !ok || claims == nil {
 				log.Printf("🚫 RoleMiddleware: No JWT claims found in context")
 				http.Error(w, "Forbidden: no valid token", http.StatusForbidden)
@@ -90,6 +132,7 @@ func RoleMiddleware(requiredRoles ...string) func(http.Handler) http.Handler {
 				}
 			}
 
+			log.Printf("🚫 RoleMiddleware: Role %s is not allowed", claims.Role)
 			http.Error(w, "Forbidden: insufficient role", http.StatusForbidden)
 		})
 	}

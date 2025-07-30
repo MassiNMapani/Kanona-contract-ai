@@ -20,7 +20,7 @@ func main() {
 	router := mux.NewRouter()
 
 	// Apply middleware
-	router.Use(middleware.JWTMiddleware)
+	//router.Use(middleware.JWTMiddleware)
 
 	// Dev mock login
 	router.HandleFunc("/mock-login", handlers.MockLogin).Methods("GET")
@@ -30,8 +30,43 @@ func main() {
 	router.HandleFunc("/health", HealthCheck).Methods("GET")
 
 	// Protected contract routes
-	router.Handle("/contracts", middleware.RoleMiddleware("admin", "ceo", "hod")(http.HandlerFunc(handlers.GetAllContracts))).Methods("GET")
-	router.Handle("/upload", middleware.RoleMiddleware("admin", "ppa-user", "psa-user")(http.HandlerFunc(handlers.UploadContract))).Methods("POST")
+	//router.Handle("/contracts", middleware.RoleMiddleware("admin", "ceo", "hod")(http.HandlerFunc(handlers.GetAllContracts))).Methods("GET")
+	//router.Handle("/upload", middleware.RoleMiddleware("admin", "ppa-user", "psa-user")(http.HandlerFunc(handlers.UploadContract))).Methods("POST")
+
+	// Protected contract routes (JWTMiddleware wraps RoleMiddleware)
+	// router.Handle("/contracts",
+	// 	middleware.JWTMiddleware(
+	// 		middleware.RoleMiddleware("admin", "ceo", "hod")(
+	// 			http.HandlerFunc(handlers.GetAllContracts),
+	// 		),
+	// 	),
+	// ).Methods("GET")
+
+	router.Handle("/contracts",
+		middleware.JWTMiddleware(
+			middleware.RoleMiddleware("admin", "ceo", "hod")(
+				http.HandlerFunc(handlers.GetAllContracts),
+			),
+		),
+	).Methods("GET")
+
+	// router.Handle("/upload",
+	// 	middleware.JWTMiddleware(
+	// 		middleware.RoleMiddleware("admin", "ppa-user", "psa-user")(
+	// 			http.HandlerFunc(handlers.UploadContract),
+	// 		),
+	// 	),
+	// ).Methods("POST")
+
+	router.Handle("/upload",
+		middleware.JWTMiddleware(
+			middleware.RoleMiddleware("admin", "ppa-user", "psa-user")(
+				http.HandlerFunc(handlers.UploadContract),
+			),
+		),
+	).Methods("POST")
+
+	//router.Handle("/upload", middleware.RoleMiddleware("admin", "ppa-user", "psa-user")(http.HandlerFunc(handlers.UploadContract))).Methods("POST")
 
 	// ✅ Enable CORS
 	c := cors.New(cors.Options{

@@ -27,6 +27,7 @@ export default function FileUpload() {
       const response = await fetch("http://localhost:8080/upload", {
         method: "POST",
         body: formData,
+        credentials: "include",
       });
 
       if (!response.ok) throw new Error("Upload failed");

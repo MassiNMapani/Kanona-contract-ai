@@ -6,18 +6,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("your_secret_key")
+var jwtKey = []byte("your_secret_key") // 🔐 Use env vars in production!
 
 type Claims struct {
 	Email string `json:"email"`
 	Role  string `json:"role"`
 	jwt.RegisteredClaims
 }
-
-// ✅ Shared context key
-type contextKey string
-
-const UserClaimsKey = contextKey("user")
 
 func GenerateJWT(email, role string) (string, error) {
 	claims := &Claims{

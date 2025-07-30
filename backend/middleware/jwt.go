@@ -64,27 +64,69 @@
 // 	})
 // }
 
+// package middleware
+
+// import (
+// 	"context"
+// 	"net/http"
+
+// 	"backend/utils"
+// )
+
+// // ✅ Define contextKey and UserClaimsKey in middleware scope
+// type contextKey string
+
+// const UserClaimsKey = contextKey("user") // Used to store JWT claims in request context
+
+// func JWTMiddleware(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		cookie, err := r.Cookie("token")
+// 		if err != nil {
+// 			next.ServeHTTP(w, r)
+// 			return
+// 		}
+
+// 		claims, err := utils.ParseJWT(cookie.Value)
+// 		if err != nil {
+// 			next.ServeHTTP(w, r)
+// 			return
+// 		}
+
+// 		// ✅ Store parsed claims in request context using correct key
+// 		ctx := context.WithValue(r.Context(), UserClaimsKey, claims)
+// 		next.ServeHTTP(w, r.WithContext(ctx))
+// 	})
+// }
+
 package middleware
 
 import (
-	"backend/utils"
 	"context"
+	"log"
 	"net/http"
+
+	"backend/utils"
 )
 
 func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("token")
 		if err != nil {
+			log.Println("❌ JWTMiddleware: No token cookie found")
 			next.ServeHTTP(w, r)
 			return
 		}
 
+		log.Println("🔍 JWTMiddleware: Token cookie found")
+
 		claims, err := utils.ParseJWT(cookie.Value)
 		if err != nil {
+			log.Println("❌ JWTMiddleware: Failed to parse JWT:", err)
 			next.ServeHTTP(w, r)
 			return
 		}
+
+		log.Printf("✅ JWTMiddleware: Parsed token for email=%s role=%s", claims.Email, claims.Role)
 
 		ctx := context.WithValue(r.Context(), utils.UserClaimsKey, claims)
 		next.ServeHTTP(w, r.WithContext(ctx))

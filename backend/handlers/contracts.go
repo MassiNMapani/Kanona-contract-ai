@@ -95,6 +95,7 @@ func GetAllContracts(w http.ResponseWriter, r *http.Request) {
 
 	// ✅ STEP 2: Extract user claims from context
 	claims, ok := r.Context().Value(utils.UserClaimsKey).(*utils.Claims)
+
 	if !ok || claims == nil {
 		http.Error(w, "Missing or invalid JWT claims", http.StatusForbidden)
 		log.Println("❌ GetAllContracts: Missing or invalid JWT claims")
